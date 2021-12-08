@@ -141,3 +141,21 @@ func UpdateOrder(ctx *fiber.Ctx) error {
 
 	return ctx.Status(200).JSON(response)
 }
+
+func DeleteOrder(ctx *fiber.Ctx) error {
+	id, err := ctx.ParamsInt("id"); if err != nil {
+		return ctx.Status(400).JSON(":id must be an integer")
+	}
+
+	var order models.Order
+
+	if err := findOrder(id, &order); err != nil {
+		return ctx.Status(404).JSON(err.Error())
+	}
+
+	if err := database.Database.Db.Delete(&order).Error; err != nil {
+		return ctx.Status(400).JSON(err.Error())
+	}
+
+	return ctx.Status(200).SendString("Order deleted.")
+}
